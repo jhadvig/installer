@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strings"
 
 	"github.com/pkg/errors"
 	survey "gopkg.in/AlecAivazis/survey.v1"
@@ -59,6 +60,9 @@ func (a *sshPublicKey) Generate(asset.Parents) error {
 
 	pubKeys := map[string]string{}
 	if path, ok := os.LookupEnv("OPENSHIFT_INSTALL_SSH_PUB_KEY_PATH"); ok {
+		if !strings.HasPrefix(path, "/") {
+			return errors.New("invalid public key file path (should be an absolute path)")
+		}
 		key, err := readSSHKey(path)
 		if err != nil {
 			return errors.Wrap(err, "failed to read public key file")
